@@ -1,0 +1,19 @@
+[project]
+name = "handwritten-character-recognition"
+version = "1.0.0"
+description = "CNN-based handwritten digit and letter recognition (MNIST / EMNIST) with a reproducible training pipeline and an image-file inference CLI"
+requires-python = ">=3.10"
+authors = [{ name = "Raaif Yousuf" }]
+license = "MIT"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"

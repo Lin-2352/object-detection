@@ -1,0 +1,101 @@
+{
+  "dataset": "emnist-letters",
+  "arch": "cnn",
+  "classes": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z"
+  ],
+  "input_shape": [
+    28,
+    28,
+    1
+  ],
+  "seed": 42,
+  "epochs_requested": 15,
+  "epochs_trained": 15,
+  "batch_size": 128,
+  "train_samples": 112320,
+  "val_samples": 12480,
+  "test_samples": 20800,
+  "test_accuracy": 0.9415865540504456,
+  "test_loss": 0.16897082328796387,
+  "params": 471162,
+  "train_seconds": 855.9485383033752,
+  "top_confusions": [
+    [
+      "I",
+      "L",
+      273
+    ],
+    [
+      "L",
+      "I",
+      108
+    ],
+    [
+      "G",
+      "Q",
+      89
+    ],
+    [
+      "Q",
+      "G",
+      74
+    ],
+    [
+      "A",
+      "Q",
+      29
+    ],
+    [
+      "C",
+      "E",
+      29
+    ],
+    [
+      "U",
+      "V",
+      27
+    ],
+    [
+      "V",
+      "U",
+      25
+    ],
+    [
+      "N",
+      "M",
+      22
+    ],
+    [
+      "O",
+      "D",
+      18
+    ]
+  ],
+  "tensorflow_version": "2.20.0"
+}
