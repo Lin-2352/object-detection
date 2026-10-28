@@ -1,19 +1,24 @@
 [project]
 name = "handwritten-character-recognition"
 version = "1.0.0"
-description = "CNN-based handwritten digit and letter recognition (MNIST / EMNIST) with a reproducible training pipeline and an image-file inference CLI"
+description = "Keras/TensorFlow recognition of 94 keyboard characters (letters, digits, symbols) from handwritten and printed images, with model sweeps, a notebook and an image-file inference CLI"
 requires-python = ">=3.10"
 authors = [{ name = "Raaif Yousuf" }]
-license = "MIT"
+license = { file = "LICENSE" }
 
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+extend-exclude = ["notebooks"]  # narrative notebook: long lines and one-line imports are fine here
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/build_notebook.py" = ["E501"]  # holds notebook source as string literals
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
 addopts = "-q"
+markers = ["slow: integration tests on the real downloaded datasets (deselect with -m \"not slow\")"]

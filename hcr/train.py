@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import tensorflow as tf  # noqa: E402
 
-from hcr.data import load_dataset  # noqa: E402
+from hcr.data import dataset_names, load_dataset  # noqa: E402
 from hcr.model import build_cnn, build_mlp, build_symbol_cnn  # noqa: E402
 
 _BUILDERS = {"cnn": build_cnn, "mlp": build_mlp}
@@ -235,7 +235,7 @@ def _parse_args(argv=None):
     parser.add_argument(
         "--dataset",
         required=True,
-        choices=["mnist", "emnist-letters", "emnist-balanced", "keyboard-symbols"],
+        choices=dataset_names(),
     )
     parser.add_argument("--arch", required=True, choices=["cnn", "mlp"])
     parser.add_argument("--epochs", type=int, default=10)

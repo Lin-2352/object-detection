@@ -99,3 +99,54 @@ def test_emnist_letters_label_shift_convention():
     classes = [chr(ord("A") + i) for i in range(26)]
 
     assert [classes[i] for i in shifted] == ["A", "B", "Z"]
+
+
+def test_data_dir_defaults_to_repo_raw_emnist(monkeypatch):
+    from pathlib import Path
+
+    import hcr.data as data
+
+    monkeypatch.delenv("HCR_DATA_DIR", raising=False)
+    expected = Path(data.__file__).resolve().parents[1] / "data" / "raw" / "emnist"
+    assert data._data_dir() == expected
+
+
+def test_data_dir_env_override(monkeypatch, tmp_path):
+    import hcr.data as data
+
+    monkeypatch.setenv("HCR_DATA_DIR", str(tmp_path))
+    assert data._data_dir() == tmp_path
+
+
+def test_emnist_byclass_registered_and_loads_from_synthetic_zip(monkeypatch, tmp_path):
+    import gzip
+    import zipfile
+
+    import hcr.data as data
+
+    assert "emnist-byclass" in data._LOADERS
+    chars = list("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
+    mapping = "\n".join(f"{i} {ord(c)}" for i, c in enumerate(chars))
+    rng = np.random.RandomState(0)
+    tr_x = rng.randint(0, 255, (3, 28, 28)).astype(np.uint8)
+    te_x = rng.randint(0, 255, (2, 28, 28)).astype(np.uint8)
+    with zipfile.ZipFile(tmp_path / "gzip.zip", "w") as zf:
+        zf.writestr("gzip/emnist-byclass-mapping.txt", mapping)
+        for split, x, y in (("train", tr_x, [0, 10, 61]), ("test", te_x, [5, 36])):
+            zf.writestr(
+                f"gzip/emnist-byclass-{split}-images-idx3-ubyte.gz",
+                gzip.compress(_make_idx_images(x)),
+            )
+            zf.writestr(
+                f"gzip/emnist-byclass-{split}-labels-idx1-ubyte.gz",
+                gzip.compress(_make_idx_labels(np.array(y))),
+            )
+    monkeypatch.setenv("HCR_DATA_DIR", str(tmp_path))
+
+    (xtr, ytr), (xte, yte), classes = data.load_dataset("emnist-byclass")
+
+    assert classes == chars
+    assert xtr.shape == (3, 28, 28, 1) and xtr.dtype == np.float32
+    assert xte.shape == (2, 28, 28, 1)
+    assert ytr.tolist() == [0, 10, 61] and yte.tolist() == [5, 36]
+    np.testing.assert_allclose(xtr[0, :, :, 0], tr_x[0].T / 255.0)

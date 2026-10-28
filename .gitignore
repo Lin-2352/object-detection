@@ -19,5 +19,12 @@ dist/
 .DS_Store
 Thumbs.db
 
-# Data
-data/
+# Data (keep only the provenance README)
+data/*
+!data/README.md
+
+# Run logs
+logs/
+
+# Claude Code local files
+.claude/

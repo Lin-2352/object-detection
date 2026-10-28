@@ -27,7 +27,8 @@ _IDX_LABEL_MAGIC = 2049
 
 
 def _data_dir() -> Path:
-    return Path(os.environ.get("HCR_DATA_DIR", str(Path.home() / ".cache" / "hcr")))
+    default = Path(__file__).resolve().parents[1] / "data" / "raw" / "emnist"
+    return Path(os.environ.get("HCR_DATA_DIR", str(default)))
 
 
 def _archive_path() -> Path:
@@ -136,12 +137,12 @@ def _load_emnist_letters():
     )
 
 
-def _load_emnist_balanced():
+def _load_emnist_mapped(name: str):
     archive = _ensure_archive()
     with zipfile.ZipFile(archive) as zf:
-        mapping_text = zf.read("gzip/emnist-balanced-mapping.txt").decode("ascii")
-        x_train, y_train = _load_emnist_split(zf, "emnist-balanced", "train")
-        x_test, y_test = _load_emnist_split(zf, "emnist-balanced", "test")
+        mapping_text = zf.read(f"gzip/{name}-mapping.txt").decode("ascii")
+        x_train, y_train = _load_emnist_split(zf, name, "train")
+        x_test, y_test = _load_emnist_split(zf, name, "test")
     mapping = parse_balanced_mapping(mapping_text)
     num_classes = max(mapping) + 1
     classes = [chr(mapping[i]) for i in range(num_classes)]
@@ -152,12 +153,27 @@ def _load_emnist_balanced():
     )
 
 
+def _load_emnist_balanced():
+    return _load_emnist_mapped("emnist-balanced")
+
+
+def load_emnist_byclass():
+    """Load EMNIST 'byclass': 62 classes (0-9, A-Z, a-z), label order from the mapping file."""
+    return _load_emnist_mapped("emnist-byclass")
+
+
 _LOADERS = {
     "mnist": _load_mnist,
     "emnist-letters": _load_emnist_letters,
     "emnist-balanced": _load_emnist_balanced,
+    "emnist-byclass": load_emnist_byclass,
     "keyboard-symbols": load_keyboard_symbols,
 }
+
+
+def dataset_names() -> list[str]:
+    """Names accepted by :func:`load_dataset` (the training CLI offers exactly these)."""
+    return sorted(_LOADERS)
 
 
 def load_dataset(name: str):
