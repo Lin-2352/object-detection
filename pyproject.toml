@@ -3,7 +3,6 @@ name = "handwritten-character-recognition"
 version = "1.0.0"
 description = "Keras/TensorFlow recognition of 94 keyboard characters (letters, digits, symbols) from handwritten and printed images, with model sweeps, a notebook and an image-file inference CLI"
 requires-python = ">=3.10"
-authors = [{ name = "Raaif Yousuf" }]
 license = { file = "LICENSE" }
 
 [tool.ruff]
