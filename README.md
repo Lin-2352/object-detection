@@ -10,6 +10,7 @@ This figure shows the EMNIST balanced model (47 classes) on the images in `sampl
 
 - Preprocessing composites transparent PNGs over white and inverts dark-on-light images. It then crops to the ink, scales the longer side to 20 px and centers it by center of mass in a 28x28 frame, the same way MNIST was made.
 - EMNIST is read straight from the official NIST archive. Its transposed images are flipped back upright, and each label is mapped to its character.
+- `keyboard-symbols` adds 32 common printed keyboard symbols (`!`, `@`, `#`, `$`, `%`, `&`, brackets, operators, punctuation, and related keys) using deterministic OpenCV glyph rendering. It is a synthetic printed-glyph benchmark, not handwritten-symbol recognition.
 - The model has two conv blocks (32 and 64 filters) with batch norm and dropout, then a dense layer. Rotation, shift and zoom augmentation runs during training only. The original tutorial MLP is still available with `--arch mlp` as a baseline.
 - Training fixes seeds and uses deterministic ops. It holds out 10% of the training set for early stopping and scores the official test set once. Each run saves the model and a JSON file of its metrics to `models/`, and a confusion matrix and training curves to `reports/`.
 
@@ -17,13 +18,14 @@ This figure shows the EMNIST balanced model (47 classes) on the images in `sampl
 
 I trained every model on CPU (seed 42, up to 15 epochs) and scored each one on its dataset's official test split:
 
-| Dataset | Classes | Original MLP | CNN |
-|---|---:|---:|---:|
-| MNIST | 10 | 98.09% | 99.39% |
-| EMNIST balanced | 47 | 83.84% | 88.46% |
-| EMNIST letters | 26 | not trained | 94.16% |
+| Dataset         | Classes | Original MLP |    CNN |
+| --------------- | ------: | -----------: | -----: |
+| MNIST           |      10 |       98.09% | 99.39% |
+| EMNIST balanced |      47 |       83.84% | 88.46% |
+| EMNIST letters  |      26 |  not trained | 94.16% |
+| Keyboard symbols (synthetic printed glyphs) | 32 | not trained | 100.00% |
 
-Most errors on EMNIST balanced come from pairs that are ambiguous in handwriting: `O`/`0`, `L`/`1`, `I`/`1` and `F`/`f`. See the [confusion matrix](reports/emnist_balanced_cnn_confusion.png). The repo includes the MNIST and EMNIST balanced models. The other trained models are attached to the [v1.0.0 release](https://github.com/Raaif-Yousuf/AI-Handwritten-Character-Recognition/releases/tag/v1.0.0).
+Most errors on EMNIST balanced come from pairs that are ambiguous in handwriting: `O`/`0`, `L`/`1`, `I`/`1` and `F`/`f`. See the [confusion matrix](reports/emnist_balanced_cnn_confusion.png). The repo includes the MNIST and EMNIST balanced models. Other trained models can be generated with the training command below.
 
 ## Run it
 
@@ -32,10 +34,20 @@ pip install -r requirements.txt
 python -m hcr.predict samples/emnist_test_upper_A.png          # EMNIST balanced model
 python -m hcr.predict samples/digit_*.png --model models/mnist_cnn.keras
 python -m hcr.train --dataset emnist-balanced --arch cnn --epochs 15
+python -m hcr.train --dataset keyboard-symbols --arch cnn --epochs 8
 ```
 
 The first EMNIST training run downloads the dataset (about 536 MB) to `~/.cache/hcr`.
 
 Tests use synthetic data only. Run `pip install -r requirements-dev.txt && pytest` (29 tests); CI runs them on every pull request.
 
-MIT licensed. Based originally on NeuralNine's handwritten digit recognition tutorial.
+## Symbol data source and limitations
+
+GitHub research found MIT-licensed [Chars74K implementations](https://github.com/thopkins32/Chars74k),
+but Chars74K contains alphanumeric characters rather than the requested
+keyboard punctuation. The symbol extension therefore generates glyphs with
+OpenCV's bundled Hershey fonts and does not copy an external dataset. Accuracy
+reported for `keyboard-symbols` measures fixed printed glyph templates rendered
+by those fonts; it is not evidence of accuracy on arbitrary handwritten
+symbols. A future handwritten-symbol model should be trained on a separately
+licensed labeled symbol dataset.

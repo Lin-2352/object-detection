@@ -20,7 +20,7 @@ import numpy as np  # noqa: E402
 import tensorflow as tf  # noqa: E402
 
 from hcr.data import load_dataset  # noqa: E402
-from hcr.model import build_cnn, build_mlp  # noqa: E402
+from hcr.model import build_cnn, build_mlp, build_symbol_cnn  # noqa: E402
 
 _BUILDERS = {"cnn": build_cnn, "mlp": build_mlp}
 
@@ -157,7 +157,10 @@ def run_training(
     x_tr, y_tr, x_val, y_val = _split_train_val(x_train, y_train, val_split, seed)
     validation_data = (x_val, y_val) if len(x_val) > 0 else None
 
-    model = _BUILDERS[arch](num_classes)
+    if arch == "cnn" and dataset == "keyboard-symbols":
+        model = build_symbol_cnn(num_classes)
+    else:
+        model = _BUILDERS[arch](num_classes)
 
     callbacks = [
         keras.callbacks.EarlyStopping(monitor="val_loss", patience=5, restore_best_weights=True),
@@ -230,7 +233,9 @@ def run_training(
 def _parse_args(argv=None):
     parser = argparse.ArgumentParser(description="Train an hcr model.")
     parser.add_argument(
-        "--dataset", required=True, choices=["mnist", "emnist-letters", "emnist-balanced"]
+        "--dataset",
+        required=True,
+        choices=["mnist", "emnist-letters", "emnist-balanced", "keyboard-symbols"],
     )
     parser.add_argument("--arch", required=True, choices=["cnn", "mlp"])
     parser.add_argument("--epochs", type=int, default=10)

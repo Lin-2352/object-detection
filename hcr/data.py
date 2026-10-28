@@ -18,6 +18,8 @@ from pathlib import Path
 import numpy as np
 from keras.datasets import mnist as _keras_mnist
 
+from hcr.symbols import load_keyboard_symbols
+
 EMNIST_URL = "https://biometrics.nist.gov/cs_links/EMNIST/gzip.zip"
 
 _IDX_IMAGE_MAGIC = 2051
@@ -154,11 +156,12 @@ _LOADERS = {
     "mnist": _load_mnist,
     "emnist-letters": _load_emnist_letters,
     "emnist-balanced": _load_emnist_balanced,
+    "keyboard-symbols": load_keyboard_symbols,
 }
 
 
 def load_dataset(name: str):
-    """Load a dataset by name: 'mnist', 'emnist-letters' or 'emnist-balanced'.
+    """Load a dataset by name, including the synthetic 'keyboard-symbols' set.
 
     Returns ((x_train, y_train), (x_test, y_test), classes) where the x
     arrays are float32 of shape (N, 28, 28, 1) scaled to [0, 1] with white

@@ -5,7 +5,7 @@ import json
 import numpy as np
 import pytest
 
-from hcr.model import build_cnn, build_mlp
+from hcr.model import build_cnn, build_mlp, build_symbol_cnn
 from hcr.train import run_training
 
 
@@ -16,7 +16,7 @@ def _synthetic_dataset(num_samples=32, num_classes=5, seed=0):
     return x, y
 
 
-@pytest.mark.parametrize("build_fn", [build_cnn, build_mlp])
+@pytest.mark.parametrize("build_fn", [build_cnn, build_mlp, build_symbol_cnn])
 def test_build_output_shape(build_fn):
     model = build_fn(5)
     x, _ = _synthetic_dataset(num_samples=4, num_classes=5)
